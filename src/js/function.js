@@ -1,15 +1,47 @@
-import { axiosPhoto } from './api';
+import { AxiosPhotos } from './api';
+import Notiflix from 'notiflix';
 
 const gallery = document.querySelector('.gallery');
 console.log(gallery);
 
+const axiosPhotos = new AxiosPhotos();
+console.log(axiosPhotos);
+
 function handleSubmit(event) {
   event.preventDefault();
-  const namePhotos = event.currentTarget.elements.searchQuery.value;
-  console.log(namePhotos);
+  axiosPhotos.q = event.currentTarget.elements.searchQuery.value.trim();
+  console.log(axiosPhotos.q);
   // const photos = axiosPhoto(namePhotos);
   // console.log(axiosPhoto(namePhotos));
-  axiosPhoto(namePhotos).then(createMarkupCardPhots);
+  console.log(processTheRequest());
+  processTheRequest().then(createMarkupCardPhots);
+}
+
+async function processTheRequest() {
+  console.log(axiosPhotos.getPhotos());
+  try {
+    const response = await axiosPhotos.getPhotos();
+    // const photos = await response.data;
+    // .then(response => {
+    //   console.log(response);
+    //   console.log(response.data.totalHits);
+    //   console.log(response.status);
+    if (!response.status) {
+      throw new Error(response.status);
+    }
+    // return response;
+    // }
+    // .then(function (response) {
+    if (!response.data.totalHits) {
+      throw new Error('No data');
+    }
+    return response;
+  } catch (error) {
+    console.log(error);
+    Notiflix.Notify.failure(
+      `Sorry, there are no images matching your search query "${this.q}". Please try again.`
+    );
+  }
 }
 
 function createMarkupCardPhots(arr) {
