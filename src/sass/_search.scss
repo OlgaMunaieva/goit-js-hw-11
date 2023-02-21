@@ -33,9 +33,13 @@ input {
   // margin-bottom: 10px;
 }
 
-.gallery {
+.gallery-container {
   position: relative;
   top: 40px;
+  padding-bottom: 30px;
+}
+
+.gallery {
   display: grid;
   width: 100%;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -63,7 +67,7 @@ img {
 
 .info {
   display: flex;
-  column-gap: 5px;
+  column-gap: 12px;
   // align-items: end;
   // margin-bottom: 0;
   // margin-top: auto;
@@ -71,10 +75,11 @@ img {
 
 .info-item {
   display: flex;
+
   flex-wrap: wrap;
   justify-content: center;
   gap: 4px;
-  font-size: 14px;
+  font-size: 16px;
 }
 .gallery-item {
   width: 100%;
@@ -92,6 +97,13 @@ img {
   margin-left: auto;
   margin-right: auto;
   margin-top: 20px;
-  margin-bottom: 10px;
   border-radius: 4px;
+}
+
+.load-more:disabled {
+  background-color: #c1c1c1;
+  cursor: not-allowed;
+}
+.load-more.hidden {
+  display: none;
 }

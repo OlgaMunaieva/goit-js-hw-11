@@ -1,62 +1,65 @@
 import { AxiosPhotos } from './api';
+import { LoadMoreBtn } from './components/buttonUpload';
 import Notiflix from 'notiflix';
 
+export const loadMoreBtn = new LoadMoreBtn({
+  selector: '.load-more',
+  isHidden: true,
+});
+
 const gallery = document.querySelector('.gallery');
-console.log(gallery);
+// console.log(gallery);
 
 const axiosPhotos = new AxiosPhotos();
 console.log(axiosPhotos);
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
   event.preventDefault();
-  axiosPhotos.q = event.currentTarget.elements.searchQuery.value.trim();
   console.log(axiosPhotos.q);
-  // const photos = axiosPhoto(namePhotos);
-  // console.log(axiosPhoto(namePhotos));
-  console.log(processTheRequest());
-  processTheRequest().then(createMarkupCardPhots);
+  axiosPhotos.q = event.currentTarget.elements.searchQuery.value.trim();
+  axiosPhotos.page = 0;
+  console.log(axiosPhotos.q);
+  const data = await processTheRequest();
+  const markup = await createMarkupCardPhotos(data);
+  cleanMarkup();
+  const firstPhotos = await uploadMarkupFirst(markup);
+  loadMoreBtn.isHidden = false;
+  loadMoreBtn.show();
+  loadMoreBtn.enable();
+  console.log(axiosPhotos.page);
 }
 
 async function processTheRequest() {
-  console.log(axiosPhotos.getPhotos());
+  // console.log(axiosPhotos.getPhotos());
   try {
-    const response = await axiosPhotos.getPhotos();
-    // const photos = await response.data;
-    // .then(response => {
-    //   console.log(response);
-    //   console.log(response.data.totalHits);
-    //   console.log(response.status);
-    if (!response.status) {
-      throw new Error(response.status);
-    }
-    // return response;
-    // }
-    // .then(function (response) {
-    if (!response.data.totalHits) {
+    const data = await axiosPhotos.getPhotos();
+    if (!data.totalHits) {
       throw new Error('No data');
     }
-    return response;
+
+    return data;
   } catch (error) {
     console.log(error);
+    cleanMarkup();
+    loadMoreBtn.isHidden = true;
+    loadMoreBtn.hide();
     Notiflix.Notify.failure(
-      `Sorry, there are no images matching your search query "${this.q}". Please try again.`
+      `Sorry, there are no images matching your search query "${axiosPhotos.q}". Please try again.`
     );
   }
 }
 
-function createMarkupCardPhots(arr) {
-  const { data } = arr;
-  console.log(data);
-  const { hits } = data;
+function createMarkupCardPhotos(arr) {
+  const { hits } = arr;
   console.log(hits);
-  cleanMarkup();
-  // console.log(arr);
+  // cleanMarkup();
   const markup = hits.reduce(
     (markup, namePhoto) => markup + createMarkupCardPhoto(namePhoto),
     ''
   );
-  console.log(markup);
-  gallery.innerHTML = markup;
+  // console.log(markup);
+  // gallery.insertAdjacentHTML('beforeend', markup);
+  return markup;
 }
 
 function createMarkupCardPhoto({
@@ -95,4 +98,37 @@ function cleanMarkup() {
   gallery.innerHTML = '';
 }
 
-export { handleSubmit };
+function uploadMarkupFirst(markup) {
+  gallery.innerHTML = markup;
+}
+
+async function fetchPhotos() {
+  loadMoreBtn.disable();
+  const data = await processTheRequest();
+  console.log(axiosPhotos.page);
+  console.log(data.totalHits);
+  if ((axiosPhotos.page - 1) * 40 > data.totalHits) {
+    Notiflix.Notify.info(
+      `We're sorry, but you've reached the end of search results.`
+    );
+    loadMoreBtn.isHidden = true;
+    loadMoreBtn.hide();
+    return;
+  }
+  const markup = await createMarkupCardPhotos(data);
+  const nextPhotos = await appendNewsToList(markup);
+  loadMoreBtn.enable();
+  return nextPhotos;
+}
+
+function appendNewsToList(markup) {
+  gallery.insertAdjacentHTML('beforeend', markup);
+}
+
+function handleInput() {
+  cleanMarkup();
+  loadMoreBtn.isHidden = true;
+  loadMoreBtn.hide();
+}
+
+export { handleSubmit, fetchPhotos, handleInput };
