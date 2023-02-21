@@ -1,6 +1,7 @@
 import { AxiosPhotos } from './api';
 import { LoadMoreBtn } from './components/buttonUpload';
 import Notiflix from 'notiflix';
+import simpleLightbox from 'simplelightbox';
 
 export const loadMoreBtn = new LoadMoreBtn({
   selector: '.load-more',
@@ -13,6 +14,12 @@ const gallery = document.querySelector('.gallery');
 const axiosPhotos = new AxiosPhotos();
 console.log(axiosPhotos);
 
+// const activePicture = new SimpleLightbox('.gallery-item', {
+//   captionsData: 'alt',
+//   captionDelay: 250,
+// });
+// activePicture.on('show.simplelightbox');
+
 async function handleSubmit(event) {
   event.preventDefault();
   console.log(axiosPhotos.q);
@@ -23,6 +30,7 @@ async function handleSubmit(event) {
   const markup = await createMarkupCardPhotos(data);
   cleanMarkup();
   const firstPhotos = await uploadMarkupFirst(markup);
+  Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`);
   loadMoreBtn.isHidden = false;
   loadMoreBtn.show();
   loadMoreBtn.enable();
@@ -117,6 +125,7 @@ async function fetchPhotos() {
   }
   const markup = await createMarkupCardPhotos(data);
   const nextPhotos = await appendNewsToList(markup);
+  // activePicture.refresh();
   loadMoreBtn.enable();
   return nextPhotos;
 }
