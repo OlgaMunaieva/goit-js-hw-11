@@ -10,9 +10,7 @@ export const loadMoreBtn = new LoadMoreBtn({
 });
 
 const gallery = document.querySelector('.gallery');
-
 const axiosPhotos = new AxiosPhotos();
-
 const activePicture = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
@@ -28,7 +26,6 @@ async function handleSubmit(event) {
   await uploadMarkupFirst(markup);
   Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`);
   activePicture.refresh();
-  loadMoreBtn.isHidden = false;
   loadMoreBtn.show();
   loadMoreBtn.enable();
 }
@@ -40,7 +37,6 @@ async function fetchPhotos() {
     Notiflix.Notify.info(
       `We're sorry, but you've reached the end of search results.`
     );
-    loadMoreBtn.isHidden = true;
     loadMoreBtn.hide();
     return;
   }
@@ -53,7 +49,6 @@ async function fetchPhotos() {
 
 function handleInput() {
   cleanMarkup();
-  loadMoreBtn.isHidden = true;
   loadMoreBtn.hide();
 }
 
@@ -66,7 +61,6 @@ async function processTheRequest() {
     return data;
   } catch (error) {
     cleanMarkup();
-    loadMoreBtn.isHidden = true;
     loadMoreBtn.hide();
     Notiflix.Notify.failure(
       `Sorry, there are no images matching your search query "${axiosPhotos.q}". Please try again.`
