@@ -8,4 +8,10 @@ formEl.addEventListener('submit', handleSubmit);
 
 loadMoreBtn.button.addEventListener('click', fetchPhotos);
 
-// formEl.addEventListener('input', handleInput);
+formEl.addEventListener(
+  'input',
+  debounce(handleInput, 300, {
+    leading: true,
+    trailing: false,
+  })
+);

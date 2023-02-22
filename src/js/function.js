@@ -47,10 +47,10 @@ async function fetchPhotos() {
   return nextPhotos;
 }
 
-// function handleInput() {
-//   // cleanMarkup();
-//   loadMoreBtn.hide();
-// }
+function handleInput() {
+  // cleanMarkup();
+  loadMoreBtn.hide();
+}
 
 async function processTheRequest() {
   try {
