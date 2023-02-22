@@ -18,6 +18,7 @@ const activePicture = new SimpleLightbox('.gallery a', {
 
 async function handleSubmit(event) {
   event.preventDefault();
+  window.scrollTo(0, 0);
   axiosPhotos.q = event.currentTarget.elements.searchQuery.value.trim();
   axiosPhotos.page = 0;
   const data = await processTheRequest();
