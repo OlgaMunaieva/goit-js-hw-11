@@ -49,6 +49,7 @@ async function fetchPhotos() {
 
 function handleInput() {
   // cleanMarkup();
+  loadMoreBtn.isHidden = true;
   loadMoreBtn.hide();
 }
 
