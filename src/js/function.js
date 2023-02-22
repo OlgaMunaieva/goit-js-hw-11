@@ -17,7 +17,6 @@ const activePicture = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
 });
-activePicture.on('show.simplelightbox');
 
 async function handleSubmit(event) {
   event.preventDefault();
@@ -26,12 +25,36 @@ async function handleSubmit(event) {
   const data = await processTheRequest();
   const markup = await createMarkupCardPhotos(data);
   cleanMarkup();
-  const firstPhotos = await uploadMarkupFirst(markup);
+  await uploadMarkupFirst(markup);
   Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`);
   activePicture.refresh();
   loadMoreBtn.isHidden = false;
   loadMoreBtn.show();
   loadMoreBtn.enable();
+}
+
+async function fetchPhotos() {
+  loadMoreBtn.disable();
+  const data = await processTheRequest();
+  if ((axiosPhotos.page - 1) * 40 > data.totalHits) {
+    Notiflix.Notify.info(
+      `We're sorry, but you've reached the end of search results.`
+    );
+    loadMoreBtn.isHidden = true;
+    loadMoreBtn.hide();
+    return;
+  }
+  const markup = await createMarkupCardPhotos(data);
+  const nextPhotos = await appendNewsToList(markup);
+  activePicture.refresh();
+  loadMoreBtn.enable();
+  return nextPhotos;
+}
+
+function handleInput() {
+  cleanMarkup();
+  loadMoreBtn.isHidden = true;
+  loadMoreBtn.hide();
 }
 
 async function processTheRequest() {
@@ -40,7 +63,6 @@ async function processTheRequest() {
     if (!data.totalHits) {
       throw new Error('No data');
     }
-
     return data;
   } catch (error) {
     cleanMarkup();
@@ -101,32 +123,8 @@ function uploadMarkupFirst(markup) {
   gallery.innerHTML = markup;
 }
 
-async function fetchPhotos() {
-  loadMoreBtn.disable();
-  const data = await processTheRequest();
-  if ((axiosPhotos.page - 1) * 40 > data.totalHits) {
-    Notiflix.Notify.info(
-      `We're sorry, but you've reached the end of search results.`
-    );
-    loadMoreBtn.isHidden = true;
-    loadMoreBtn.hide();
-    return;
-  }
-  const markup = await createMarkupCardPhotos(data);
-  const nextPhotos = await appendNewsToList(markup);
-  activePicture.refresh();
-  loadMoreBtn.enable();
-  return nextPhotos;
-}
-
 function appendNewsToList(markup) {
   gallery.insertAdjacentHTML('beforeend', markup);
-}
-
-function handleInput() {
-  cleanMarkup();
-  loadMoreBtn.isHidden = true;
-  loadMoreBtn.hide();
 }
 
 export { handleSubmit, fetchPhotos, handleInput };
