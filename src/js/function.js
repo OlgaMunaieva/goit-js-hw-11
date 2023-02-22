@@ -1,9 +1,7 @@
 import { AxiosPhotos } from './api';
 import { LoadMoreBtn } from './components/buttonUpload';
 import Notiflix from 'notiflix';
-// Описаний в документації
 import SimpleLightbox from 'simplelightbox';
-// Додатковий імпорт стилів
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 export const loadMoreBtn = new LoadMoreBtn({
@@ -12,10 +10,8 @@ export const loadMoreBtn = new LoadMoreBtn({
 });
 
 const gallery = document.querySelector('.gallery');
-// console.log(gallery);
 
 const axiosPhotos = new AxiosPhotos();
-console.log(axiosPhotos);
 
 const activePicture = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
@@ -25,10 +21,8 @@ activePicture.on('show.simplelightbox');
 
 async function handleSubmit(event) {
   event.preventDefault();
-  console.log(axiosPhotos.q);
   axiosPhotos.q = event.currentTarget.elements.searchQuery.value.trim();
   axiosPhotos.page = 0;
-  console.log(axiosPhotos.q);
   const data = await processTheRequest();
   const markup = await createMarkupCardPhotos(data);
   cleanMarkup();
@@ -38,11 +32,9 @@ async function handleSubmit(event) {
   loadMoreBtn.isHidden = false;
   loadMoreBtn.show();
   loadMoreBtn.enable();
-  console.log(axiosPhotos.page);
 }
 
 async function processTheRequest() {
-  // console.log(axiosPhotos.getPhotos());
   try {
     const data = await axiosPhotos.getPhotos();
     if (!data.totalHits) {
@@ -51,7 +43,6 @@ async function processTheRequest() {
 
     return data;
   } catch (error) {
-    console.log(error);
     cleanMarkup();
     loadMoreBtn.isHidden = true;
     loadMoreBtn.hide();
@@ -63,14 +54,10 @@ async function processTheRequest() {
 
 function createMarkupCardPhotos(arr) {
   const { hits } = arr;
-  console.log(hits);
-  // cleanMarkup();
   const markup = hits.reduce(
     (markup, namePhoto) => markup + createMarkupCardPhoto(namePhoto),
     ''
   );
-  // console.log(markup);
-  // gallery.insertAdjacentHTML('beforeend', markup);
   return markup;
 }
 
@@ -117,8 +104,6 @@ function uploadMarkupFirst(markup) {
 async function fetchPhotos() {
   loadMoreBtn.disable();
   const data = await processTheRequest();
-  console.log(axiosPhotos.page);
-  console.log(data.totalHits);
   if ((axiosPhotos.page - 1) * 40 > data.totalHits) {
     Notiflix.Notify.info(
       `We're sorry, but you've reached the end of search results.`
@@ -143,11 +128,5 @@ function handleInput() {
   loadMoreBtn.isHidden = true;
   loadMoreBtn.hide();
 }
-
-// const activePicture = new SimpleLightbox('.gallery a', {
-//   captionsData: 'alt',
-//   captionDelay: 250,
-// });
-// activePicture.on('show.simplelightbox');
 
 export { handleSubmit, fetchPhotos, handleInput };
