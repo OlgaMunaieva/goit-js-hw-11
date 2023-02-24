@@ -11,10 +11,13 @@ export const loadMoreBtn = new LoadMoreBtn({
 
 const gallery = document.querySelector('.gallery');
 const axiosPhotos = new AxiosPhotos();
-const activePicture = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
-  captionDelay: 250,
-});
+const activePicture = new SimpleLightbox(
+  '.gallery a'
+  // , {
+  // captionsData: 'alt',
+  // captionDelay: 250,
+  // }
+);
 
 async function handleSubmit(event) {
   event.preventDefault();
